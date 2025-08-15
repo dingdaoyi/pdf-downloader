@@ -1,0 +1,18 @@
+{
+  "name": "jiaoyu-pdf-download",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "build:extension": "vite build --config vite.extension.config.js"
+  },
+  "dependencies": {
+    "vue": "^3.5.18",
+    "element-plus": "^2.8.8",
+    "@element-plus/icons-vue": "^2.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^4.6.2",
+    "vite": "^5.4.10"
+  }
+}
