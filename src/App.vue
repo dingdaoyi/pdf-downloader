@@ -2,10 +2,25 @@
 import { ref, onMounted, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Download, Refresh, View, Delete } from '@element-plus/icons-vue'
+import { useI18n } from 'vue-i18n'
+import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
+import en from 'element-plus/dist/locale/en.mjs'
 
+const { t, locale } = useI18n()
 const pdfList = ref([])
 const loading = ref(false)
 const searchText = ref('')
+
+// Language switcher
+const currentLocale = computed({
+  get: () => locale.value,
+  set: (val) => {
+    locale.value = val
+    localStorage.setItem('language', val)
+    // Reload to update Element Plus locale
+    location.reload()
+  }
+})
 
 // 过滤后的PDF列表
 const filteredPdfList = computed(() => {
@@ -27,7 +42,7 @@ const loadPdfRequests = async () => {
     const response = await chrome.runtime.sendMessage({ action: 'getPdfRequests' })
     pdfList.value = response.pdfRequests || []
   } catch (error) {
-    ElMessage.error('获取PDF列表失败')
+    ElMessage.error(t('message.getFailed'))
   } finally {
     loading.value = false
   }
@@ -38,7 +53,7 @@ const downloadPdf = async (pdfInfo) => {
   try {
     const [tab] = await chrome.tabs.query({active: true, currentWindow: true})
     if (!tab) {
-      ElMessage.error('未找到活动标签页')
+      ElMessage.error(t('message.noActiveTab'))
       return
     }
     
@@ -49,20 +64,20 @@ const downloadPdf = async (pdfInfo) => {
     })
     
     if (response && response.success) {
-      ElMessage.success('下载成功')
+      ElMessage.success(t('message.downloadSuccess'))
     } else {
-      ElMessage.error('下载失败: ' + (response?.error || '未知错误'))
+      ElMessage.error(t('message.downloadFailed') + ': ' + (response?.error || t('message.unknownError')))
     }
   } catch (error) {
-    ElMessage.error('下载失败: ' + error.message)
+    ElMessage.error(t('message.downloadFailed') + ': ' + error.message)
   }
 }
 
 // 显示请求头详情
 const showHeaders = async (headers) => {
-  const headerText = headers?.map(h => `${h.name}: ${h.value}`).join('\n') || '无请求头'
-  await ElMessageBox.alert(headerText, '请求头信息', {
-    confirmButtonText: '确定',
+  const headerText = headers?.map(h => `${h.name}: ${h.value}`).join('\n') || t('message.noHeaders')
+  await ElMessageBox.alert(headerText, t('message.requestHeadersTitle'), {
+    confirmButtonText: t('message.ok'),
     customStyle: { 'word-break': 'break-all' }
   })
 }
@@ -70,11 +85,13 @@ const showHeaders = async (headers) => {
 // 清空列表
 const clearList = async () => {
   try {
-    await ElMessageBox.confirm('确定要清空所有PDF记录吗？', '确认清空', {
-      type: 'warning'
+    await ElMessageBox.confirm(t('message.confirmClear'), t('message.confirmClearTitle'), {
+      type: 'warning',
+      confirmButtonText: t('message.ok'),
+      cancelButtonText: t('message.cancel')
     })
     pdfList.value = []
-    ElMessage.success('列表已清空')
+    ElMessage.success(t('message.listCleared'))
   } catch {
     // 用户取消
   }
@@ -139,10 +156,14 @@ onMounted(() => {
     <!-- 头部 -->
     <div class="header">
       <div class="title">
-        <span>📄 PDF下载助手</span>
+        <span>📄 {{ t('app.title') }}</span>
         <el-tag size="small" type="info">{{ filteredPdfList.length }}</el-tag>
       </div>
       <div class="actions">
+        <el-select v-model="currentLocale" size="small" style="width: 90px; margin-right: 8px;">
+          <el-option label="中文" value="zh-CN" />
+          <el-option label="English" value="en" />
+        </el-select>
         <el-button :icon="Refresh" size="small" @click="loadPdfRequests" :loading="loading" />
         <el-button :icon="Delete" size="small" type="danger" @click="clearList" :disabled="!pdfList.length" />
       </div>
@@ -151,7 +172,7 @@ onMounted(() => {
     <!-- 搜索框 -->
     <el-input 
       v-model="searchText" 
-      placeholder="搜索PDF文件名或URL" 
+      :placeholder="t('app.search')" 
       size="small" 
       clearable
       class="search-input"
@@ -160,7 +181,7 @@ onMounted(() => {
     <!-- PDF列表 -->
     <div class="pdf-list" v-loading="loading">
       <el-empty v-if="!filteredPdfList.length" 
-        :description="pdfList.length ? '没有匹配的PDF文件' : '暂无PDF请求记录'" 
+        :description="pdfList.length ? t('message.noMatch') : t('message.noRecords')" 
         :image-size="60" />
       
       <div v-for="pdf in filteredPdfList" :key="pdf.url + pdf.timestamp" class="pdf-item">
@@ -170,7 +191,7 @@ onMounted(() => {
           <div class="pdf-meta">
             <span class="time">{{ formatTime(pdf.timestamp) }}</span>
             <span v-if="getFileSize(pdf.requestHeaders)" class="size">{{ getFileSize(pdf.requestHeaders) }}</span>
-            <el-tag v-if="hasAuth(pdf.requestHeaders)" size="small" type="success">已认证</el-tag>
+            <el-tag v-if="hasAuth(pdf.requestHeaders)" size="small" type="success">{{ t('pdf.authenticated') }}</el-tag>
           </div>
         </div>
         <div class="pdf-actions">
