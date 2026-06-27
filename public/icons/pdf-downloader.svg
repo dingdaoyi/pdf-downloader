@@ -1,0 +1,41 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="88" y1="64" x2="424" y2="448" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0F172A"/>
+      <stop offset="0.58" stop-color="#2563EB"/>
+      <stop offset="1" stop-color="#0F766E"/>
+    </linearGradient>
+    <linearGradient id="arrow" x1="256" y1="188" x2="256" y2="326" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#38BDF8"/>
+      <stop offset="1" stop-color="#22C55E"/>
+    </linearGradient>
+    <linearGradient id="badge" x1="128" y1="334" x2="384" y2="402" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#EF4444"/>
+      <stop offset="1" stop-color="#F97316"/>
+    </linearGradient>
+    <filter id="shadow" x="68" y="58" width="376" height="408" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#0F172A" flood-opacity="0.24"/>
+    </filter>
+  </defs>
+
+  <rect x="40" y="40" width="432" height="432" rx="104" fill="url(#bg)"/>
+  <path d="M104 118C136 84 181 64 233 64H336C398 64 448 114 448 176V306C448 366 409 419 352 438" stroke="#FFFFFF" stroke-opacity="0.14" stroke-width="24" stroke-linecap="round"/>
+  <circle cx="114" cy="394" r="18" fill="#FFFFFF" fill-opacity="0.16"/>
+  <circle cx="404" cy="126" r="12" fill="#FFFFFF" fill-opacity="0.18"/>
+
+  <g filter="url(#shadow)">
+    <path d="M144 88H312L384 160V400C384 417.673 369.673 432 352 432H144C126.327 432 112 417.673 112 400V120C112 102.327 126.327 88 144 88Z" fill="#F8FAFC"/>
+    <path d="M312 88V142C312 151.941 320.059 160 330 160H384L312 88Z" fill="#CBD5E1"/>
+    <path d="M162 170H280" stroke="#CBD5E1" stroke-width="20" stroke-linecap="round"/>
+    <path d="M162 220H304" stroke="#E2E8F0" stroke-width="20" stroke-linecap="round"/>
+  </g>
+
+  <path d="M256 184V292" stroke="url(#arrow)" stroke-width="48" stroke-linecap="round"/>
+  <path d="M204 258L256 310L308 258" stroke="url(#arrow)" stroke-width="48" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M188 328H324" stroke="#0F172A" stroke-opacity="0.16" stroke-width="26" stroke-linecap="round"/>
+
+  <rect x="112" y="330" width="288" height="82" rx="34" fill="url(#badge)"/>
+  <path d="M178 384V358H194C205 358 212 364 212 373C212 382 205 388 194 388H188V384H178ZM188 378H194C199 378 202 376 202 373C202 370 199 368 194 368H188V378Z" fill="white"/>
+  <path d="M226 384V358H239C255 358 265 368 265 384C265 400 255 410 239 410H226V384ZM236 400H239C249 400 255 394 255 384C255 374 249 368 239 368H236V400Z" fill="white"/>
+  <path d="M281 410V358H318V368H291V380H314V390H291V410H281Z" fill="white"/>
+</svg>
