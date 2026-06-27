@@ -1,9 +1,25 @@
 export default {
   app: {
     title: 'PDF Downloader',
+    subtitle: 'Capture web PDF documents for quick reading and download',
     refresh: 'Refresh',
     clear: 'Clear',
-    search: 'Search PDF filename or URL'
+    search: 'Search filename, site, or URL',
+    download: 'Download',
+    downloadAll: 'Download list',
+    openPdf: 'Open PDF',
+    copyUrl: 'Copy URL',
+    language: 'Language',
+    filter: 'Filter PDF records'
+  },
+  filter: {
+    all: 'All',
+    auth: 'Login',
+    today: 'Today'
+  },
+  status: {
+    showing: 'Showing {count}',
+    kept: 'Captured {count}'
   },
   message: {
     downloadSuccess: 'Download successful',
@@ -14,16 +30,22 @@ export default {
     listCleared: 'List cleared',
     confirmClear: 'Are you sure you want to clear all PDF records?',
     confirmClearTitle: 'Confirm Clear',
-    requestHeadersTitle: 'Request Headers',
-    noHeaders: 'No headers',
+    close: 'Close',
     confirm: 'Confirm',
     cancel: 'Cancel',
     ok: 'OK',
     noMatch: 'No matching PDF files',
-    noRecords: 'No PDF request records'
+    noRecords: 'No PDF request records',
+    emptyHint: 'Open a page with a PDF or preview a document, then click the extension icon to see downloadable records.',
+    urlCopied: 'URL copied',
+    copyFailed: 'Copy failed',
+    clearFailed: 'Failed to clear records',
+    batchDownloadDone: 'Created {count} download tasks',
+    openedPdf: 'Opened PDF reader',
+    openFailed: 'Failed to open PDF'
   },
   pdf: {
-    authenticated: 'Authenticated',
+    authenticated: 'Login',
     fileName: 'File Name',
     time: 'Time',
     size: 'Size'

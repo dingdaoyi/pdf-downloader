@@ -1,7 +1,8 @@
 {
-  "name": "PDF下载助手",
-  "version": "1.1.0",
-  "description": "智能监听PDF请求，保留认证信息，一键下载",
+  "name": "PDF下载助手 - PDF Downloader",
+  "short_name": "PDF下载助手",
+  "version": "1.2.0",
+  "description": "自动捕获网页中的PDF文档，支持搜索、阅读和一键下载课程课件、论文、报告和内部资料。",
   "manifest_version": 3,
   "background": {
     "service_worker": "background.js"
@@ -17,8 +18,7 @@
     "storage",
     "tabs",
     "activeTab",
-    "webRequest",
-    "downloads"
+    "webRequest"
   ],
   "host_permissions": [
     "<all_urls>"

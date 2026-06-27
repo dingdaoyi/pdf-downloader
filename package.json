@@ -1,14 +1,15 @@
 {
   "name": "jiaoyu-pdf-download",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.2.0",
+  "description": "Chrome/Edge PDF capture and download extension",
   "type": "module",
   "scripts": {
-    "build:extension": "vite build --config vite.extension.config.js"
+    "build:extension": "node build.js",
+    "package": "bash package.sh"
   },
   "dependencies": {
-    "@element-plus/icons-vue": "^2.3.1",
-    "element-plus": "^2.8.8",
+    "@lucide/vue": "^1.0.0",
     "vue": "^3.5.18",
     "vue-i18n": "^11.2.2"
   },

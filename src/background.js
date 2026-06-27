@@ -1,89 +1,116 @@
-// 存储PDF请求信息
-let pdfRequests = [];
+const MAX_RECORDS = 80
 
-// 监听网络请求
-chrome.webRequest.onBeforeRequest.addListener(
-  (details) => {
-    if (details.url.toLowerCase().includes('.pdf') && details.method === 'GET' &&
-        !details.url.includes('#') && !details.url.includes('disablestream')) {
-      const pdfInfo = {
-        url: details.url,
-        timestamp: Date.now(),
-        tabId: details.tabId,
-        method: details.method,
-        requestHeaders: []
-      };
-      
-      // 添加到存储
-      pdfRequests.unshift(pdfInfo);
-      // 只保留最近50个请求
-      if (pdfRequests.length > 50) {
-        pdfRequests = pdfRequests.slice(0, 50);
-      }
-      
-      console.log('检测到PDF请求:', details.url);
-    }
-  },
-  { urls: ["<all_urls>"] },
-  []
-);
+let pdfRequests = []
+const storageReady = chrome.storage.local.get({ pdfRequests: [] }).then((result) => {
+  const storedRequests = Array.isArray(result.pdfRequests) ? result.pdfRequests : []
+  const currentUrls = new Set(pdfRequests.map((request) => request.url))
+  const restoredRequests = storedRequests.filter((request) => !currentUrls.has(request.url))
+  pdfRequests = [...pdfRequests, ...restoredRequests].slice(0, MAX_RECORDS)
+})
 
-// 监听请求头
+const now = () => Date.now()
+
+const isPdfUrl = (url = '') => {
+  try {
+    const parsed = new URL(url)
+    return parsed.pathname.toLowerCase().endsWith('.pdf')
+  } catch {
+    return url.toLowerCase().includes('.pdf')
+  }
+}
+
+const normalizeHeaders = (headers = []) => {
+  return headers
+    .filter((header) => header?.name && typeof header.value !== 'undefined')
+    .map((header) => ({ name: header.name, value: String(header.value) }))
+}
+
+const extractFileName = (url = '') => {
+  try {
+    const parsed = new URL(url)
+    const lastSegment = parsed.pathname.split('/').filter(Boolean).pop()
+    const decoded = decodeURIComponent(lastSegment || 'download.pdf')
+    return decoded.toLowerCase().endsWith('.pdf') ? decoded : `${decoded}.pdf`
+  } catch {
+    return 'download.pdf'
+  }
+}
+
+const persistRequests = () => {
+  chrome.storage.local.set({ pdfRequests })
+}
+
+const upsertPdfRequest = (details, requestHeaders = [], responseHeaders = []) => {
+  const existingIndex = pdfRequests.findIndex((request) => request.url === details.url)
+  const record = {
+    id: details.requestId || `${details.url}-${now()}`,
+    url: details.url,
+    timestamp: now(),
+    tabId: details.tabId,
+    frameId: details.frameId,
+    parentFrameId: details.parentFrameId,
+    method: details.method,
+    type: details.type,
+    requestHeaders: normalizeHeaders(requestHeaders),
+    responseHeaders: normalizeHeaders(responseHeaders),
+    fileName: extractFileName(details.url)
+  }
+
+  if (existingIndex >= 0) {
+    pdfRequests.splice(existingIndex, 1)
+  }
+
+  pdfRequests.unshift(record)
+  pdfRequests = pdfRequests.slice(0, MAX_RECORDS)
+  persistRequests()
+}
+
 chrome.webRequest.onBeforeSendHeaders.addListener(
   (details) => {
-    if (details.url.toLowerCase().includes('.pdf') && details.method === 'GET' && 
-        !details.url.includes('#') && !details.url.includes('disablestream') &&
-        !details.requestHeaders.some(h => h.name === 'Access-Control-Request-Method')) {
-      
-      // 过滤Range请求（分片下载），只保留完整文件请求
-      const hasRange = details.requestHeaders.some(h => h.name.toLowerCase() === 'range');
-      if (hasRange) {
-        console.log('过滤Range请求:', details.url);
-        return;
-      }
-      
-      console.log('捕获PDF完整请求头:', details.url, details.requestHeaders);
-      
-      // 查找并更新对应的请求
-      const index = pdfRequests.findIndex(req => 
-        req.url === details.url && Math.abs(req.timestamp - Date.now()) < 10000
-      );
-      
-      if (index !== -1) {
-        pdfRequests[index].requestHeaders = details.requestHeaders;
-        pdfRequests[index].timestamp = Date.now();
-      } else {
-        // 创建新的请求记录
-        const pdfInfo = {
-          url: details.url,
-          timestamp: Date.now(),
-          tabId: details.tabId,
-          method: details.method,
-          requestHeaders: details.requestHeaders
-        };
-        pdfRequests.unshift(pdfInfo);
-        if (pdfRequests.length > 50) {
-          pdfRequests = pdfRequests.slice(0, 50);
-        }
-      }
-      
-      chrome.storage.local.set({ pdfRequests });
+    if (details.method !== 'GET') {
+      return
     }
-  },
-  { urls: ["<all_urls>"] },
-  ["requestHeaders"]
-);
 
-// 处理来自popup的消息
+    if (!isPdfUrl(details.url) || details.url.includes('#') || details.url.includes('disablestream')) {
+      return
+    }
+
+    if (details.requestHeaders?.some((header) => header.name === 'Access-Control-Request-Method')) {
+      return
+    }
+
+    const hasRange = details.requestHeaders?.some((header) => header.name.toLowerCase() === 'range')
+    if (hasRange) {
+      return
+    }
+
+    upsertPdfRequest(details, details.requestHeaders || [])
+  },
+  { urls: ['<all_urls>'] },
+  ['requestHeaders', 'extraHeaders']
+)
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  console.log('收到消息:', request);
-  
   if (request.action === 'getPdfRequests') {
-    console.log('返回PDF请求列表:', pdfRequests);
-    sendResponse({ pdfRequests });
+    storageReady.then(() => {
+      sendResponse({ pdfRequests })
+    })
+    return true
   }
-});
+
+  if (request.action === 'clearPdfRequests') {
+    pdfRequests = []
+    chrome.storage.local.set({ pdfRequests: [] }, () => {
+      sendResponse({ success: true })
+    })
+    return true
+  }
+
+  return false
+})
 
 chrome.runtime.onInstalled.addListener(() => {
-  console.log('PDF下载助手已安装');
-});
+  storageReady.then(() => chrome.storage.local.get({ pdfRequests: [] }, (result) => {
+    pdfRequests = Array.isArray(result.pdfRequests) ? result.pdfRequests.slice(0, MAX_RECORDS) : []
+  }))
+})
