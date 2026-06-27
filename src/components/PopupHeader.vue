@@ -1,5 +1,5 @@
 <script setup>
-import { FileText, Languages, RefreshCw } from '@lucide/vue'
+import { Languages, RefreshCw } from '@lucide/vue'
 
 defineProps({
   currentLocale: {
@@ -23,7 +23,7 @@ defineEmits(['refresh', 'update:currentLocale'])
   <header class="header">
     <div class="brand">
       <div class="brand-mark" aria-hidden="true">
-        <FileText :size="22" />
+        <img src="/icons/pdf-downloader-48.png" alt="" />
       </div>
       <div class="brand-copy">
         <h1>{{ t('app.title') }}</h1>

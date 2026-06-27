@@ -73,9 +73,16 @@ select:focus-visible {
   display: grid;
   place-items: center;
   flex: 0 0 auto;
-  border-radius: 10px;
-  color: #ffffff;
-  background: #f97316;
+  border-radius: 11px;
+  overflow: hidden;
+  background: #0f172a;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.16);
+}
+
+.brand-mark img {
+  width: 42px;
+  height: 42px;
+  display: block;
 }
 
 .brand-copy {
