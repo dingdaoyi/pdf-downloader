@@ -1,7 +1,7 @@
 {
   "name": "jiaoyu-pdf-download",
   "private": true,
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Chrome/Edge PDF capture and download extension",
   "type": "module",
   "scripts": {

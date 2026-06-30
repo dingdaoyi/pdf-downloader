@@ -35,4 +35,7 @@ async function buildExtension() {
   console.log('请将dist目录加载到Chrome扩展程序中')
 }
 
-buildExtension().catch(console.error)
+buildExtension().catch((error) => {
+  console.error(error)
+  process.exit(1)
+})

@@ -1,7 +1,7 @@
 {
   "name": "PDF下载助手 - PDF Downloader",
   "short_name": "PDF下载助手",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "自动捕获网页中的PDF文档，支持搜索、阅读和一键下载课程课件、论文、报告和内部资料。",
   "manifest_version": 3,
   "background": {
@@ -16,7 +16,6 @@
   ],
   "permissions": [
     "storage",
-    "tabs",
     "activeTab",
     "webRequest"
   ],

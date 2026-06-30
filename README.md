@@ -78,7 +78,7 @@ PDF下载, PDF downloader, PDF download helper, 下载PDF, 课件下载, 论文�
 
 - `webRequest`：用于识别网页中的 PDF 文档请求。
 - `storage`：用于在本地保存最近捕获的 PDF 请求记录。
-- `tabs` / `activeTab`：用于把下载或阅读指令发送到当前网页，在当前登录上下文中读取 PDF。
+- `activeTab`：用户点击扩展弹窗后，用于把下载或阅读指令发送到当前网页，在当前登录上下文中读取 PDF。
 - `<all_urls>`：用于在不同网站上识别 PDF 请求。扩展只在本机处理请求记录，不会上传数据。
 
 ## 开发
